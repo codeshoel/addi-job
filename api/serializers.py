@@ -1,10 +1,18 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 from .models import (
     Organization, 
     Category,
     Job,
     Position
     )
+
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = '__all__'
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
@@ -44,7 +52,6 @@ class JobSerializer(serializers.ModelSerializer):
             'name',
             'description',
             'date_published',
-            'job_start_date',
             'no_of_hire',
             'job_category_id',
             'job_position_id',
