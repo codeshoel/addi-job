@@ -1,143 +1,66 @@
-from django.contrib.auth import get_user_model
-
-from rest_framework.views import APIView
+from rest_framework import generics, mixins
 from rest_framework.response import Response
-from rest_framework import (
-    authentication, 
-    permissions, 
-    generics, 
-    viewsets
-    )
+from rest_framework.views import APIView
+
+from api.models import Job
+
+from api.serializers import JobSerializer
 
 
-from .serializers import (
-    OrganizationSerializer,
-    JobSerializer,
-    CategorySerializer,
-    PositionSerializer,
-    UserSerializer,
-)
+class JobListAPIView(generics.ListAPIView):
+    serializer_class = JobSerializer
 
-from .models import (
-    Job,
-    Organization,
-    Category,
-    Position
-)
+    def get_queryset(self):
+        queryset = Job.objects.all().order_by('-post_is_paid')
+        sq = self.request.GET.get('q')
 
-
-class UserViewset(viewsets.ModelViewSet):
-    # authentication_classes = [
-    #     # authentication.BasicAuthentication,
-    #     authentication.TokenAuthentication,
-    #     ]
-    permission_classes = [permissions.IsAuthenticated]
-
-    serializer_class = UserSerializer
-    queryset = get_user_model().objects.all()
-
-user_viewset_view = UserViewset.as_view({'get': 'list', 'post': 'create'})
-
-
-class OrganizationSerializerAPIView(generics.ListCreateAPIView):
-
-    """
-    The API View handles the post and get organization data.
-    """
-
-    authentication_classes = [
-        authentication.BasicAuthentication,
-        authentication.SessionAuthentication,
-        authentication.TokenAuthentication,
-        ]
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
-
-    queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
+        if sq is not None:
+            qs = queryset.filter(title__contains=sq, is_available=True)
+            return qs
+        else:
+            qs = queryset.filter(is_available=True)
+            return qs
 
     def perform_create(self, serializer):
         serializer.save()
 
-organization_list_create_view = OrganizationSerializerAPIView.as_view()
+    def post(self, request, *args, **kwargs):
+            return self.create(request, *args, **kwargs)
 
 
-class CategorySerializerListCreateAPIView(generics.ListCreateAPIView):
-    
-    """
-    The API View handles the post and get job category data.
-    """
-
-    # authentication_classes = [
-    #     authentication.BasicAuthentication,
-    #     authentication.SessionAuthentication,
-    #     authentication.TokenAuthentication
-    #     ]
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
-
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-
-    def perform_create(self, serializer):
-        serializer.save()
-
-category_list_create_view = CategorySerializerListCreateAPIView.as_view()
+job_list_view = JobListAPIView.as_view()
 
 
-class PositionSerializerListCreateAPIView(generics.ListCreateAPIView):
-    
-    """
-    The API View handles the post and get job position data.
-    """
-
-    # authentication_classes = [
-    #     authentication.BasicAuthentication,
-    #     authentication.SessionAuthentication,
-    #     authentication.TokenAuthentication
-    #     ]
-    
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
-
-    queryset = Position.objects.all()
-    serializer_class = PositionSerializer
-
-    def perform_create(self, serializer):
-        serializer.save()
-
-position_list_create_view = PositionSerializerListCreateAPIView.as_view()
-
-
-class JobSerializerListAPIView(generics.ListAPIView):
-    
-    """
-    The API View permmits read-only endpoint (GET request method) to job model instance.
-    """
-
+class JobCreateAPIView(generics.CreateAPIView):
     queryset = Job.objects.all()
     serializer_class = JobSerializer
 
-job_list_view = JobSerializerListAPIView.as_view()
+job_create_view = JobCreateAPIView.as_view()
 
 
-class JobSerializerCreateAPIView(generics.CreateAPIView):
-    
-    """
-    The API View permmits create-only endpoint (POST request method) to job model instance.
-    """
-
-    authentication_classes = [
-        authentication.BasicAuthentication,
-        authentication.SessionAuthentication,
-        authentication.TokenAuthentication,
-        ]
-
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
-
+class JobRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Job.objects.all()
     serializer_class = JobSerializer
 
-    def perform_create(self, serializer):
-        serializer.save()
 
-job_create_view = JobSerializerCreateAPIView.as_view()
+    def retrieve(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        try:
+            instance = self.queryset.get(id=pk, is_available=True)
+        except Job.DoesNotExist:
+            return Response({"message": "Job is not available."})
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+job_rud_view = JobRUDAPIView.as_view()
+
+
+class LoginAPIView(APIView):
+    pass
+
+
+
+class RegistrationAPIView(APIView):
+    pass
 
 

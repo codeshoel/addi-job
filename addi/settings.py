@@ -138,7 +138,7 @@ REST_FRAMEWORK = {
     ],
     
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly', # This permission allows only GET
+        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly', # This permission allows only GET
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
 }

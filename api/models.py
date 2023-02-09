@@ -1,49 +1,25 @@
+from django.conf import settings
 from django.db import models
-
-
-
-class Organization(models.Model):
-
-    name = models.CharField(max_length=255)
-    description = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
-
-
-
-class Category(models.Model):
-    
-    name = models.CharField(max_length=255)
-    description = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
-
-
-class Position(models.Model):
-
-    name = models.CharField(max_length=255)
-    description = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
+from django.contrib.auth.models import User
 
 
 class Job(models.Model):
 
-    name = models.CharField(max_length=255)
-    description = models.CharField(max_length=500)
-    date_published = models.DateField(auto_now_add=True)
-    no_of_hire = models.PositiveIntegerField(default=1)
-    job_category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
-    job_position_id = models.ForeignKey(Position, on_delete=models.CASCADE)
-    organizations_id = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    no_of_applicants = models.PositiveIntegerField(default=0)
+    fk = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
+    salary = models.CharField(max_length=255, blank=True, null=True)
+    desc = models.CharField(max_length=255, blank=True, null=True)
+    no_hire = models.CharField(max_length=255,)
+    is_available = models.BooleanField(max_length=255, blank=True, null=True)
+    deactivated_at = models.DateField(auto_now_add=False, blank=True, null=True)
+    posted_at = models.DateField(auto_now_add=True, blank=True, null=True)
+    post_is_paid = models.BooleanField(max_length=255, default=False, blank=True, null=True)
 
 
     def __str__(self):
-        self.name
+        return self.title
+
+
 
 
 
