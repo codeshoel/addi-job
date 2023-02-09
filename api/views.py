@@ -7,11 +7,11 @@ from api.models import Job
 from api.serializers import JobSerializer
 
 
-class JobListAPIView(generics.ListAPIView):
+class JobListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = JobSerializer
 
     def get_queryset(self):
-        queryset = Job.objects.all().order_by('-post_is_paid')
+        queryset = Job.objects.all().order_by('-post_is_paid', '-posted_at')
         sq = self.request.GET.get('q')
 
         if sq is not None:
@@ -24,22 +24,12 @@ class JobListAPIView(generics.ListAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
-    def post(self, request, *args, **kwargs):
-            return self.create(request, *args, **kwargs)
+job_list_create_view = JobListCreateAPIView.as_view()
 
-
-job_list_view = JobListAPIView.as_view()
-
-
-class JobCreateAPIView(generics.CreateAPIView):
-    queryset = Job.objects.all()
-    serializer_class = JobSerializer
-
-job_create_view = JobCreateAPIView.as_view()
 
 
 class JobRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Job.objects.all()
+    queryset = Job.objects.all().order_by('-post_is_paid', '-posted_at')
     serializer_class = JobSerializer
 
 
