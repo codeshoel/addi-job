@@ -41,16 +41,18 @@ INSTALLED_APPS = [
     # installed app
     'api',
     'rest_framework',
+    "corsheaders",
 
     # Auth installed apps
     'rest_framework.authtoken',
-    'rest_framework_simplejwt',
+    #'rest_framework_simplejwt',
 ]
 
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -133,14 +135,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
     
     'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly', # This permission allows only GET
-        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly', # This permission allows only GET
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
 }
+
+# django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
+CORS_URLS_REGEX = r"^/api/.*$"
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
 
 
