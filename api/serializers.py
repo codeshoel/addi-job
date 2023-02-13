@@ -7,15 +7,27 @@ from api.models import Job
 
 
 class UserSerializer(serializers.ModelSerializer):
-    class Mete:
+    password = serializers.CharField(write_only = True, style = {'input_type': 'password'})
+    is_staff = serializers.BooleanField(default=True)
+
+    class Meta:
         model = User
-        fields = '__all__'
+        fields = [
+            'id',
+            'first_name',
+            'last_name',
+            'username',
+            'email',
+            'password',
+            'is_staff',
+        ]
 
 
 class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
         fields = [
+            'owner',
             'id', 
             'title', 
             'salary',
